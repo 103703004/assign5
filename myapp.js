@@ -24,57 +24,50 @@ $('#dropdown li').on('click', function () {
     //alert($(this).text());
     $("#city").text($(this).text());
     //console.log($(this).text().substr(0,3));
-    $.getJSON(findUrl($(this).text().substr(0, 3)), function (data) {
-        var c = tempFtoC(data.query.results.channel.item.condition.temp);
-        $(".temperature").text(c);
-        $(".date").text(data.query.results.channel.item.forecast[0].date + ": ");
-        $("#weather").text(data.query.results.channel.item.forecast[0].text);
-        $("#first").text(data.query.results.channel.item.forecast[1].date);
-        $("#second").text(data.query.results.channel.item.forecast[2].date);
-        $("#third").text(data.query.results.channel.item.forecast[3].date);
-        var lowC = tempFtoC(data.query.results.channel.item.forecast[1].low);
-        var highC = tempFtoC(data.query.results.channel.item.forecast[1].high);
-        $("#firstTemp").text(lowC + "-" + highC);
-        lowC = tempFtoC(data.query.results.channel.item.forecast[2].low);
-        highC = tempFtoC(data.query.results.channel.item.forecast[2].high);
-        $("#secondTemp").text(lowC + "-" + highC);
-        lowC = tempFtoC(data.query.results.channel.item.forecast[3].low);
-        highC = tempFtoC(data.query.results.channel.item.forecast[3].high);
-        $("#thirdTemp").text(lowC + "-" + highC);
-        skycons.set("today", getCode(data.query.results.channel.item.forecast[0].code));
-        skycons.set("day1", getCode(data.query.results.channel.item.forecast[1].code));
-        skycons.set("day2", getCode(data.query.results.channel.item.forecast[2].code));
-        skycons.set("day3", getCode(data.query.results.channel.item.forecast[3].code));
+    var url = findUrl($(this).text().substr(0, 3));
+    $.getJSON(url, function (data) {
+        if (data.query.results) { // if data.query.results exist , do the following action.
+            callback2(data)
+        } else {
+            console.info("reloading : ", url)
+            getJsonUntilSuccess(url, callback2)
+        }
     });
 });
+
+function callback2(data) {
+    var c = tempFtoC(data.query.results.channel.item.condition.temp);
+    $(".temperature").text(c);
+    $(".date").text(data.query.results.channel.item.forecast[0].date + ": ");
+    $("#weather").text(data.query.results.channel.item.forecast[0].text);
+    $("#first").text(data.query.results.channel.item.forecast[1].date);
+    $("#second").text(data.query.results.channel.item.forecast[2].date);
+    $("#third").text(data.query.results.channel.item.forecast[3].date);
+    var lowC = tempFtoC(data.query.results.channel.item.forecast[1].low);
+    var highC = tempFtoC(data.query.results.channel.item.forecast[1].high);
+    $("#firstTemp").text(lowC + "-" + highC);
+    lowC = tempFtoC(data.query.results.channel.item.forecast[2].low);
+    highC = tempFtoC(data.query.results.channel.item.forecast[2].high);
+    $("#secondTemp").text(lowC + "-" + highC);
+    lowC = tempFtoC(data.query.results.channel.item.forecast[3].low);
+    highC = tempFtoC(data.query.results.channel.item.forecast[3].high);
+    $("#thirdTemp").text(lowC + "-" + highC);
+    skycons.set("today", getCode(data.query.results.channel.item.forecast[0].code));
+    skycons.set("day1", getCode(data.query.results.channel.item.forecast[1].code));
+    skycons.set("day2", getCode(data.query.results.channel.item.forecast[2].code));
+    skycons.set("day3", getCode(data.query.results.channel.item.forecast[3].code));
+}
 
 $(document).ready(function () {
 
     $.getJSON("https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22Taipei%20City%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys",
         function (data) {
-            //console.log(data);
-            var c = tempFtoC(data.query.results.channel.item.condition.temp);
-            //console.log(c);
-            $(".temperature").text(c);
-            $(".date").text(data.query.results.channel.item.forecast[0].date + ": ");
-            $("#weather").text(data.query.results.channel.item.forecast[0].text);
-            $("#first").text(data.query.results.channel.item.forecast[1].date);
-            $("#second").text(data.query.results.channel.item.forecast[2].date);
-            $("#third").text(data.query.results.channel.item.forecast[3].date);
-            var lowC = tempFtoC(data.query.results.channel.item.forecast[1].low);
-            var highC = tempFtoC(data.query.results.channel.item.forecast[1].high);
-            $("#firstTemp").text(lowC + "-" + highC);
-            lowC = tempFtoC(data.query.results.channel.item.forecast[2].low);
-            highC = tempFtoC(data.query.results.channel.item.forecast[2].high);
-            $("#secondTemp").text(lowC + "-" + highC);
-            lowC = tempFtoC(data.query.results.channel.item.forecast[3].low);
-            highC = tempFtoC(data.query.results.channel.item.forecast[3].high);
-            $("#thirdTemp").text(lowC + "-" + highC);
-            //console.log(data.query.results.channel.item.forecast[0].code);
-            skycons.set("today", getCode(data.query.results.channel.item.forecast[0].code));
-            skycons.set("day1", getCode(data.query.results.channel.item.forecast[1].code));
-            skycons.set("day2", getCode(data.query.results.channel.item.forecast[2].code));
-            skycons.set("day3", getCode(data.query.results.channel.item.forecast[3].code));
+            if (data.query.results) { // if data.query.results exist , do the following action.
+                callback1(data)
+            } else {
+                console.info("reloading")
+                getJsonUntilSuccess("https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22Taipei%20City%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys", callback1)
+            }
         });
 
     var $dropdown = $("#dropdown li a");
@@ -82,14 +75,72 @@ $(document).ready(function () {
         //console.log($(element).text());
         var url = findUrl($(element).text());
         //console.log(url);
-        $.getJSON(url, function (data) {
-            //console.log(data);
-            //console.log(data.query.results.channel.item.condition.temp);
-            var c = tempFtoC(data.query.results.channel.item.condition.temp);
-            $("<span>").text(c + "°C").css("padding-left", "20px").appendTo($(element));
-        });
+        getJsonUntilSuccess1(url,element)
     });
 });
+
+function getJsonUntilSuccess1(url,element) {
+
+    $.getJSON(url, function (data) {
+
+        if (data.query.results) { // if data.query.results exist , do the following action.
+            countTemp(data,element)
+        } else {
+            console.info("reloading : ", url)
+            getJsonUntilSuccess1(url,element)
+        }
+
+    })
+
+}
+
+function countTemp(data,element) {
+    //console.log(data);
+    //console.log(data.query.results.channel.item.condition.temp);
+    var c = tempFtoC(data.query.results.channel.item.condition.temp);
+    $("<span>").text(c + "°C").css("padding-left", "20px").appendTo($(element));
+}
+
+function callback1(data) {
+    //console.log(data);
+    var c = tempFtoC(data.query.results.channel.item.condition.temp);
+    //console.log(c);
+    $(".temperature").text(c);
+    $(".date").text(data.query.results.channel.item.forecast[0].date + ": ");
+    $("#weather").text(data.query.results.channel.item.forecast[0].text);
+    $("#first").text(data.query.results.channel.item.forecast[1].date);
+    $("#second").text(data.query.results.channel.item.forecast[2].date);
+    $("#third").text(data.query.results.channel.item.forecast[3].date);
+    var lowC = tempFtoC(data.query.results.channel.item.forecast[1].low);
+    var highC = tempFtoC(data.query.results.channel.item.forecast[1].high);
+    $("#firstTemp").text(lowC + "-" + highC);
+    lowC = tempFtoC(data.query.results.channel.item.forecast[2].low);
+    highC = tempFtoC(data.query.results.channel.item.forecast[2].high);
+    $("#secondTemp").text(lowC + "-" + highC);
+    lowC = tempFtoC(data.query.results.channel.item.forecast[3].low);
+    highC = tempFtoC(data.query.results.channel.item.forecast[3].high);
+    $("#thirdTemp").text(lowC + "-" + highC);
+    //console.log(data.query.results.channel.item.forecast[0].code);
+    skycons.set("today", getCode(data.query.results.channel.item.forecast[0].code));
+    skycons.set("day1", getCode(data.query.results.channel.item.forecast[1].code));
+    skycons.set("day2", getCode(data.query.results.channel.item.forecast[2].code));
+    skycons.set("day3", getCode(data.query.results.channel.item.forecast[3].code));
+}
+
+function getJsonUntilSuccess(url, callback) {
+
+    $.getJSON(url, function (data) {
+
+        if (data.query.results) { // if data.query.results exist , do the following action.
+            callback(data)
+        } else {
+            console.info("reloading : ", url)
+            getJsonUntilSuccess(url, callback)
+        }
+
+    })
+
+}
 
 function tempFtoC(F) {
     return Math.round((F - 32) * (5 / 9)).toString();
@@ -231,5 +282,5 @@ function getCode(code) {
         default:    //3200 	not available
             console.log(code + " not available");
     }
-    
+
 }
