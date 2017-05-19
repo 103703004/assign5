@@ -25,7 +25,7 @@ $('#dropdown li').on('click', function () {
     $("#city").text($(this).text());
     //console.log($(this).text().substr(0,3));
     var url = findUrl($(this).text().substr(0, 3));
-    $.getJSON(url, function (data) {
+    $.getWeatherJSON(url, function (data) {
         if (data.query.results) { // if data.query.results exist , do the following action.
             callback2(data)
         } else {
@@ -60,7 +60,7 @@ function callback2(data) {
 
 $(document).ready(function () {
 
-    $.getJSON("https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22Taipei%20City%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys",
+    $.getWeatherJSON("https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22Taipei%20City%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys",
         function (data) {
             if (data.query.results) { // if data.query.results exist , do the following action.
                 callback1(data)
@@ -81,7 +81,7 @@ $(document).ready(function () {
 
 function getJsonUntilSuccess1(url,element) {
 
-    $.getJSON(url, function (data) {
+    $.getWeatherJSON(url, function (data) {
 
         if (data.query.results) { // if data.query.results exist , do the following action.
             countTemp(data,element)
@@ -129,7 +129,7 @@ function callback1(data) {
 
 function getJsonUntilSuccess(url, callback) {
 
-    $.getJSON(url, function (data) {
+    $.getWeatherJSON(url, function (data) {
 
         if (data.query.results) { // if data.query.results exist , do the following action.
             callback(data)
